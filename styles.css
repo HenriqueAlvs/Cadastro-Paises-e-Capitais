@@ -1,0 +1,300 @@
+/* ===== Tema: Países e Capitais (estilo atlas / globo terrestre) ===== */
+
+/* importa as fontes do Google Fonts: Playfair Display (título) e Poppins (texto) */
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Poppins:wght@400;500;600&display=swap');
+
+/* variáveis de cor: muda aqui e muda no site todo */
+:root {
+    --oceano-escuro: #071a33;  /* azul bem escuro do fundo */
+    --oceano: #0f3b6b;         /* azul oceano */
+    --mar: #1e88c7;            /* azul claro do mar */
+    --verde-terra: #2bb673;    /* verde das terras */
+    --areia: #fdf8ee;          /* bege claro, cor de papel de mapa */
+    --dourado: #f4b942;        /* dourado de bússola */
+    --texto: #1c2b3a;          /* cor do texto escuro */
+    --mapa: url('https://upload.wikimedia.org/wikipedia/commons/8/80/World_map_-_low_resolution.svg');
+}
+
+/* faz a borda e o padding entrarem no tamanho dos elementos */
+* {
+    box-sizing: border-box;
+}
+
+/* estilo geral da página */
+body {
+    margin: 0;                       /* tira a margem padrão do navegador */
+    min-height: 100vh;               /* ocupa no mínimo a altura toda da tela */
+    padding: 40px 16px 60px;         /* espaço interno da página */
+    font-family: 'Poppins', Arial, sans-serif;
+    color: var(--texto);
+    display: flex;                   /* organiza os elementos com flexbox */
+    flex-direction: column;          /* um embaixo do outro */
+    align-items: center;             /* centraliza na horizontal */
+    /* fundo azul oceano com um brilho mais claro no centro */
+    background: radial-gradient(circle at 50% 30%, var(--oceano) 0%, var(--oceano-escuro) 70%);
+    background-attachment: fixed;    /* o fundo não rola junto com a página */
+    position: relative;
+    overflow-x: hidden;              /* evita rolagem para os lados */
+}
+
+/* mapa-múndi grande e transparente no fundo da página */
+body::before {
+    content: "";
+    position: fixed;                 /* fica parado atrás de tudo */
+    inset: 0;                        /* cobre a tela inteira */
+    background: var(--mapa) center / 95% auto no-repeat;
+    opacity: 0.12;                   /* bem fraquinho, só de decoração */
+    pointer-events: none;            /* não atrapalha os cliques */
+    z-index: -1;                     /* fica atrás do conteúdo */
+}
+
+/* linhas de latitude e longitude (grade de mapa) */
+body::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background-image:
+        linear-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px),  /* linhas horizontais */
+        linear-gradient(90deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px); /* linhas verticais */
+    background-size: 60px 60px;      /* tamanho de cada quadrado da grade */
+    pointer-events: none;
+    z-index: -1;
+}
+
+/* título principal */
+h1 {
+    position: relative;              /* referência para posicionar os continentes do globo */
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: 40px;
+    color: var(--areia);
+    text-align: center;
+    text-transform: uppercase;       /* deixa tudo em maiúsculo */
+    letter-spacing: 3px;             /* espaço entre as letras */
+    margin: 0 0 32px;
+    padding-bottom: 22px;            /* espaço para a linha dourada */
+    text-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+    /* linha dourada embaixo do título */
+    background: linear-gradient(var(--dourado), var(--dourado)) bottom center / 80px 4px no-repeat;
+}
+
+/* globo terrestre: o círculo azul do oceano */
+h1::before {
+    content: "";
+    display: block;                  /* fica em cima do texto */
+    width: 140px;
+    height: 140px;
+    margin: 0 auto 20px;             /* centraliza e dá espaço embaixo */
+    border-radius: 50%;              /* deixa redondo */
+    /* azul mais claro em cima à esquerda e mais escuro embaixo, dando efeito 3D */
+    background: radial-gradient(circle at 35% 30%, #4fb3ef, var(--mar) 45%, var(--oceano) 100%);
+    box-shadow: 0 0 45px rgba(30, 136, 199, 0.7); /* brilho azul em volta */
+}
+
+/* globo terrestre: os continentes verdes girando por cima do oceano */
+h1::after {
+    content: "";
+    position: absolute;              /* fica exatamente em cima do círculo azul */
+    top: 0;
+    left: 50%;
+    width: 140px;
+    height: 140px;
+    margin-left: -70px;              /* metade da largura, para centralizar */
+    border-radius: 50%;
+    /* verde com luz e sombra, igual ao oceano */
+    background: radial-gradient(circle at 35% 30%, #7be0a8, var(--verde-terra) 45%, #0d5c35 100%);
+    /* a máscara recorta o verde no formato dos continentes do mapa-múndi */
+    -webkit-mask: var(--mapa) 0 center / 280px 140px repeat-x;
+    mask: var(--mapa) 0 center / 280px 140px repeat-x;
+    animation: girar 14s linear infinite; /* faz o globo girar sem parar */
+}
+
+/* animação do globo: move os continentes para o lado, parecendo que está girando */
+@keyframes girar {
+    from { -webkit-mask-position: 0 center; mask-position: 0 center; }
+    to   { -webkit-mask-position: -280px center; mask-position: -280px center; }
+}
+
+/* esconde os <br> (o espaço é controlado pelo CSS) */
+br {
+    display: none;
+}
+
+/* caixa do formulário, com efeito de vidro */
+form {
+    display: flex;
+    flex-wrap: wrap;                 /* quebra linha se a tela for pequena */
+    gap: 14px;                       /* espaço entre os campos */
+    width: 100%;
+    max-width: 760px;
+    padding: 24px;
+    margin-bottom: 32px;
+    background: rgba(255, 255, 255, 0.1); /* branco transparente */
+    backdrop-filter: blur(10px);     /* desfoca o que está atrás (efeito vidro) */
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 20px;             /* cantos arredondados */
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+}
+
+/* campos de texto */
+input {
+    flex: 1 1 220px;                 /* cresce para ocupar o espaço, mínimo 220px */
+    padding: 14px 18px;
+    font-family: inherit;            /* usa a mesma fonte da página */
+    font-size: 16px;
+    color: var(--texto);
+    background: var(--areia);
+    border: 2px solid transparent;
+    border-radius: 12px;
+    outline: none;                   /* tira o contorno azul padrão */
+    transition: border-color 0.2s, box-shadow 0.2s; /* animação suave */
+}
+
+/* cor do texto de exemplo dentro do campo */
+input::placeholder {
+    color: #8a96a3;
+}
+
+/* quando o campo está selecionado (clicado) */
+input:focus {
+    border-color: var(--dourado);
+    box-shadow: 0 0 0 4px rgba(244, 185, 66, 0.3);
+}
+
+/* botão Cadastrar */
+button {
+    flex: 0 0 auto;                  /* não estica */
+    padding: 14px 32px;
+    font-family: inherit;
+    font-size: 16px;
+    font-weight: 600;
+    color: #fff;
+    background: linear-gradient(135deg, var(--verde-terra), var(--mar)); /* verde para azul */
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;                 /* mãozinha ao passar o mouse */
+    box-shadow: 0 6px 20px rgba(43, 182, 115, 0.4);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+/* ícone de avião antes do texto do botão */
+button::before {
+    content: "✈ ";
+}
+
+/* botão com o mouse em cima: sobe um pouquinho */
+button:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 25px rgba(43, 182, 115, 0.55);
+}
+
+/* botão sendo clicado: volta para o lugar */
+button:active {
+    transform: translateY(0);
+}
+
+/* tabela, com aparência de cartão de atlas */
+table {
+    width: 100%;
+    max-width: 760px;
+    border-collapse: separate;       /* necessário para arredondar os cantos */
+    border-spacing: 0;
+    background: var(--areia);
+    border-radius: 20px;
+    overflow: hidden;                /* corta o que passar dos cantos arredondados */
+    box-shadow: 0 15px 50px rgba(0, 0, 0, 0.4);
+}
+
+/* cabeçalho inteiro com azul em degradê */
+thead {
+    background: linear-gradient(135deg, var(--oceano), var(--mar));
+}
+
+/* células do cabeçalho */
+th {
+    padding: 18px 16px;
+    font-size: 14px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 2px;             /* espaço entre as letras */
+    color: #fff;
+}
+
+/* células do corpo da tabela */
+td {
+    padding: 16px;
+    text-align: center;
+    font-size: 17px;
+    border-bottom: 1px solid #ece4d4; /* linha fina entre as linhas */
+}
+
+/* tira a linha da última fileira */
+tbody tr:last-child td {
+    border-bottom: none;
+}
+
+/* linhas pares com fundo um pouco diferente (efeito zebra) */
+tbody tr:nth-child(even) {
+    background: #f6eedd;
+}
+
+/* cada linha aparece com uma animação suave */
+tbody tr {
+    animation: aparecer 0.4s ease;
+    transition: background 0.2s;
+}
+
+/* animação das linhas: vem de baixo e aparece */
+@keyframes aparecer {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+/* linha da tabela com o mouse em cima */
+tbody tr:hover {
+    background: #e3f2fb;
+}
+
+/* 1ª coluna (posição): coluna estreita com número em negrito */
+td:nth-child(1) {
+    width: 110px;
+    font-weight: 600;
+    color: var(--oceano);
+}
+
+/* 2ª coluna (país): nome em destaque */
+td:nth-child(2) {
+    font-weight: 600;
+    color: var(--oceano);
+}
+
+/* ícone de globo antes do nome do país */
+td:nth-child(2)::before {
+    content: "🌎 ";
+}
+
+/* ícone de alfinete de mapa antes da capital */
+td:nth-child(3)::before {
+    content: "📍 ";
+}
+
+/* ===== Celular: ajusta tamanhos em telas pequenas ===== */
+@media (max-width: 600px) {
+    h1 {
+        font-size: 28px;
+        letter-spacing: 2px;
+    }
+
+    button {
+        flex: 1 1 100%;              /* botão ocupa a linha toda */
+    }
+
+    th, td {
+        padding: 12px 8px;
+        font-size: 14px;
+    }
+
+    td:nth-child(1) {
+        width: 60px;
+    }
+}
